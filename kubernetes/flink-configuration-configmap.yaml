@@ -1,0 +1,65 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: flink-config
+  labels:
+    app: flink
+data:
+  flink-conf.yaml: |+
+    jobmanager.rpc.address: flink-jobmanager
+    taskmanager.numberOfTaskSlots: 1
+    parallelism.default: 2
+    blob.server.port: 6124
+    jobmanager.rpc.port: 6123
+    taskmanager.rpc.port: 6122
+    jobmanager.heap.size: 1024m
+    taskmanager.memory.process.size: 1024m
+    state.backend: filesystem
+    state.checkpoints.dir: file:///data/flink/checkpoints
+    # 通过zookeeper开启HA
+    high-availability: zookeeper
+    # zk quorum的服务列表
+    high-availability.zookeeper.quorum: flink-zookeeper:2181
+    # 设置作业元数据的存储位置
+    high-availability.storageDir: file:///data/flink/ha
+    high-availability.jobmanager.port: 34560
+    metrics.internal.query-service.port: 34561
+
+  log4j.properties: |+
+    log4j.rootLogger=INFO, file
+    log4j.logger.akka=INFO
+    log4j.logger.org.apache.kafka=INFO
+    log4j.logger.org.apache.hadoop=INFO
+    log4j.logger.org.apache.zookeeper=INFO
+    log4j.appender.file=org.apache.log4j.FileAppender
+    log4j.appender.file.file=${log.file}
+    log4j.appender.file.layout=org.apache.log4j.PatternLayout
+    log4j.appender.file.layout.ConversionPattern=%d{yyyy-MM-dd HH:mm:ss,SSS} %-5p %-60c %x - %m%n
+    log4j.logger.org.apache.flink.shaded.akka.org.jboss.netty.channel.DefaultChannelPipeline=ERROR, file
+  log4j-console.properties: |+
+    # This affects logging for both user code and Flink
+    log4j.rootLogger=INFO, console
+
+    # Uncomment this if you want to _only_ change Flink's logging
+    #log4j.logger.org.apache.flink=INFO
+
+    # The following lines keep the log level of common libraries/connectors on
+    # log level INFO. The root logger does not override this. You have to manually
+    # change the log levels here.
+    log4j.logger.akka=INFO
+    log4j.logger.org.apache.kafka=INFO
+    log4j.logger.org.apache.hadoop=INFO
+    log4j.logger.org.apache.zookeeper=INFO
+
+    # Log all infos to the console
+    log4j.appender.console=org.apache.log4j.ConsoleAppender
+    log4j.appender.console.layout=org.apache.log4j.PatternLayout
+    log4j.appender.console.layout.ConversionPattern=%d{yyyy-MM-dd HH:mm:ss,SSS} %-5p %-60c %x - %m%n
+
+    # Suppress the irrelevant (wrong) warnings from the Netty channel handler
+    log4j.logger.org.apache.flink.shaded.akka.org.jboss.netty.channel.DefaultChannelPipeline=ERROR, console
+  zoo.cfg: |+
+    clientPort=2181
+    dataDir=/data/zookeeper/
+    dataLogDir=/data/zookeeper/log
+    4lw.commands.whitelist=*

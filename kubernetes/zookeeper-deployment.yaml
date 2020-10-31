@@ -1,0 +1,48 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: flink-zookeeper
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: flink
+      component: zookeeper
+  template:
+    metadata:
+      labels:
+        app: flink
+        component: zookeeper
+
+    # -----
+    spec:
+      # restartPolicy: OnFailure
+      containers:
+        - name: zookeeper
+          image: zookeeper:3.6
+          ports:
+            - containerPort: 2181
+              name: port
+          livenessProbe:
+            tcpSocket:
+              port: 2181
+            initialDelaySeconds: 30
+            periodSeconds: 60
+          volumeMounts:
+            - name: zk-config-volume
+              mountPath: /conf
+            - name: flink-data
+              mountPath: /data
+
+          securityContext:
+            runAsUser: 9999
+      volumes:
+        - name: zk-config-volume
+          configMap:
+            name: flink-config
+            items:
+              - key: zoo.cfg
+                path: zoo.cfg
+        - name: flink-data
+          persistentVolumeClaim:
+            claimName: flinknfspvc

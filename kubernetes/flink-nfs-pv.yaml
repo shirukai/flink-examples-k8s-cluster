@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: flinknfspv
+spec:
+  capacity:
+    storage: 10Gi
+  accessModes:
+    - ReadWriteOnce
+  persistentVolumeReclaimPolicy: Recycle
+  storageClassName: flink-nfs
+  nfs:
+    path: /Users/shirukai/opt/nfs_data
+    server: 20.5.1.40

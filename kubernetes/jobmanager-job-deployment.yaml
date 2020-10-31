@@ -1,0 +1,68 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: flink-jobmanager
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: flink
+      component: jobmanager
+  template:
+    metadata:
+      labels:
+        app: flink
+        component: jobmanager
+
+    # -----
+    spec:
+      # restartPolicy: OnFailure
+      containers:
+        - name: jobmanager
+          image: flink-job:1.10.1-example
+          command: ["/bin/bash", "-c", "$FLINK_HOME/bin/standalone-job.sh start --job-classname  flink.k8s.cluster.examples.EventCounterJob;
+          sleep 3;
+          tail -f $FLINK_HOME/log/*.log"]
+          ports:
+            - containerPort: 6123
+              name: rpc
+            - containerPort: 6124
+              name: blob-server
+            - containerPort: 8081
+              name: webui
+            # 需要指定该端口，否则将随机生成，导致TaskManager与JobManager通信异常
+            - containerPort: 34560
+              name: ha
+            - containerPort: 34561
+              name: query
+          livenessProbe:
+            tcpSocket:
+              port: 6124
+            initialDelaySeconds: 30
+            periodSeconds: 60
+          volumeMounts:
+            - name: flink-config-volume
+              mountPath: /opt/flink/conf
+            - name: flink-data
+              mountPath: /data
+           # - name: job-artifacts-volume
+           #   mountPath: /opt/flink/usrlib
+          securityContext:
+            runAsUser: 9999  # refers to user _flink_ from official flink image, change if necessary
+      volumes:
+        - name: flink-config-volume
+          configMap:
+            name: flink-config
+            items:
+              - key: flink-conf.yaml
+                path: flink-conf.yaml
+              - key: log4j.properties
+                path: log4j.properties
+              - key: log4j-console.properties
+                path: log4j-console.properties
+        - name: flink-data
+          persistentVolumeClaim:
+            claimName: flinknfspvc
+      #  - name: job-artifacts-volume
+       #   hostPath:
+        #    path: /host/path/to/job/artifacts

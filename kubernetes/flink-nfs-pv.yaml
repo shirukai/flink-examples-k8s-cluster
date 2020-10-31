@@ -3,6 +3,9 @@ kind: PersistentVolume
 metadata:
   name: flinknfspv
 spec:
+  mountOptions:
+    - nfsvers=3
+    - nolock
   capacity:
     storage: 10Gi
   accessModes:
@@ -11,4 +14,4 @@ spec:
   storageClassName: flink-nfs
   nfs:
     path: /Users/shirukai/opt/nfs_data
-    server: 20.5.1.40
+    server: 20.5.1.21

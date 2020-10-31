@@ -22,7 +22,7 @@ object EventCounterJob {
     // 获取执行环境
     val env: StreamExecutionEnvironment = StreamExecutionEnvironment.getExecutionEnvironment
 
-    var params: ParameterTool = ParameterTool.fromArgs(args)
+    val params: ParameterTool = ParameterTool.fromArgs(args)
 
 
     env.getConfig.setGlobalJobParameters(params)
@@ -35,7 +35,7 @@ object EventCounterJob {
 
 
     // 1. 从socket中接收文本数据
-    val streamText: DataStream[String] = env.socketTextStream("20.5.1.40", 9000)
+    val streamText: DataStream[String] = env.socketTextStream(params.get("socket-host","0.0.0.0"), 9000)
       .uid("SocketSource")
 
     // 2. 将文本内容按照空格分割转换为事件样例类

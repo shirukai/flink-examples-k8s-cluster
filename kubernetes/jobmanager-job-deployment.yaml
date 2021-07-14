@@ -20,7 +20,7 @@ spec:
       containers:
         - name: jobmanager
           image: flink-job:1.10.1-example
-          command: ["/bin/bash", "-c", "$FLINK_HOME/bin/standalone-job.sh start --job-classname flink.k8s.cluster.examples.EventCounterJob --socket-host 20.5.1.21;
+          command: ["/bin/bash", "-c", "$FLINK_HOME/bin/standalone-job.sh start --job-classname flink.k8s.cluster.examples.EventCounterJob --socket-host 20.5.1.31;
           sleep 3;
           tail -f $FLINK_HOME/log/*.log"]
           ports:

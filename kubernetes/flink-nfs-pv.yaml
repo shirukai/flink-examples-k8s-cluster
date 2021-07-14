@@ -7,11 +7,11 @@ spec:
     - nfsvers=3
     - nolock
   capacity:
-    storage: 10Gi
+    storage: 30Gi
   accessModes:
     - ReadWriteOnce
   persistentVolumeReclaimPolicy: Recycle
   storageClassName: flink-nfs
   nfs:
     path: /Users/shirukai/opt/nfs_data
-    server: 20.5.1.21
+    server: 20.5.1.31

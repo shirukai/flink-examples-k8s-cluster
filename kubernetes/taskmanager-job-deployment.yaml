@@ -26,8 +26,13 @@ spec:
         - containerPort: 6125
           name: query-state
         livenessProbe:
-          tcpSocket:
-            port: 6122
+#          tcpSocket:
+#            port: 6122
+          exec:
+            command:
+              - "/bin/sh"
+              - "-c"
+              - "curl -s http://flink-jobmanager:8081/taskmanagers|grep `hostname -i`"
           initialDelaySeconds: 30
           periodSeconds: 60
         volumeMounts:

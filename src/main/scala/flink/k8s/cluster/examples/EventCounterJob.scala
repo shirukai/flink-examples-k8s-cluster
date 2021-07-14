@@ -43,7 +43,7 @@ object EventCounterJob {
       val tokens = s.split(" ")
       Event(tokens(0), tokens(1).toDouble, tokens(2).toLong)
     }).uid("String2CaseClass")
-    // 3. 按照时间id分区，然后进行聚合统计
+    // 3. 按照事件id分区，然后进行聚合统计
     val counterResult = events.keyBy(_.id)
       .process(new EventCounterProcessFunction)
       .uid("EventCounter")
